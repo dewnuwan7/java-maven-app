@@ -60,11 +60,7 @@ pipeline {
 
     stage("Commit Version"){
         steps{
-            script{
-
-
-
-            }
+            echo 'commiting to git'
         }
     }
 
