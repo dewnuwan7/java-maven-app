@@ -1,14 +1,23 @@
+
+
 pipeline {
  agent any
 
  tools{
     maven 'maven-3.9.13'
  }
+
  stages{
     stage("init"){
         steps{
             script{
                 echo "Initializing"
+                echo "Incrementing Version.."
+
+                sh "mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion} versions:commit"
+                def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                def version = matcher[0][1]
+                env.IMAGE_NAME = "$version-${BUILD_NUMBER}"
             }
         }
     }
@@ -35,6 +44,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     echo $PASSWORD | docker login -u $USERNAME --password-stdin
                     sh "docker push jma-${IMAGE_NAME}"
+                    sh "docker rmi jma-${IMAGE_NAME}"
                 }
             }
         }
@@ -44,6 +54,16 @@ pipeline {
         steps{
             script{
                 echo 'Deploying to remote VM'
+            }
+        }
+    }
+
+    stage("Commit Version"){
+        steps{
+            script{
+
+
+
             }
         }
     }
