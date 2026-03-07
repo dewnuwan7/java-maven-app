@@ -14,7 +14,8 @@ pipeline {
                 echo "Initializing"
                 echo "Incrementing Version.."
 
-                sh "mvn build-helper:parse-version versions:set-DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit"
+                sh "mvn build-helper:parse-version versions:set \
+                -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit"
                 def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
                 def version = matcher[0][1]
                 env.IMAGE_NAME = "$version-${BUILD_NUMBER}"
@@ -33,7 +34,7 @@ pipeline {
     stage("Build Docker"){
         steps{
             script{
-                sh "docker build -t jma-${IMAGE_NAME} ."
+                sh "docker build -t dewnuwan/java-maven-app:jma-${IMAGE_NAME} ."
             }
         }
     }
@@ -43,8 +44,8 @@ pipeline {
             script{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     echo $PASSWORD | docker login -u $USERNAME --password-stdin
-                    sh "docker push jma-${IMAGE_NAME}"
-                    sh "docker rmi jma-${IMAGE_NAME}"
+                    sh "docker push dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
+                    sh "docker rmi dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
                 }
             }
         }
