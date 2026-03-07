@@ -43,7 +43,7 @@ pipeline {
         steps{
             script{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    echo $PASSWORD | docker login -u $USERNAME --password-stdin
+                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
                     sh "docker push dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
                     sh "docker rmi dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
                 }
