@@ -98,29 +98,59 @@ pipeline {
 
  }
 
-    post {
-        success {
 
+    post {
+
+        success {
             slackSend(
                 channel: '#ci-cd',
                 color: 'good',
-                message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
-            )
-        }
-        failure {
+                message: """
+                        :white_check_mark: *BUILD SUCCESS*
 
+                        *Job:* ${env.JOB_NAME}
+                        *Build:* #${env.BUILD_NUMBER}
+                        *Branch:* ${env.BRANCH_NAME}
+                        *Duration:* ${currentBuild.durationString}
+
+                        *Deployment:* http://168.144.23.78:8080
+
+                        *Build Logs:* ${env.BUILD_URL}
+                        """
+                )
+        }
+
+        failure {
             slackSend(
                 channel: '#ci-cd',
                 color: 'danger',
-                message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
-            )
+                message: """
+                        :x: *BUILD FAILED*
+
+                        *Job:* ${env.JOB_NAME}
+                        *Build:* #${env.BUILD_NUMBER}
+                        *Branch:* ${env.BRANCH_NAME}
+
+                        Check logs:
+                        ${env.BUILD_URL}
+                        """
+                )
         }
 
         unstable {
             slackSend(
                 channel: '#ci-cd',
                 color: 'warning',
-                message: "UNSTABLE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
+                message: """
+                        :warning: *BUILD UNSTABLE*
+
+                        *Job:* ${env.JOB_NAME}
+                        *Build:* #${env.BUILD_NUMBER}
+                        *Branch:* ${env.BRANCH_NAME}
+
+                        Review test results:
+                        ${env.BUILD_URL}
+                        """
             )
         }
     }
