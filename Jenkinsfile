@@ -12,7 +12,7 @@ pipeline {
     stage('Checkout') {
                     steps {
                         checkout scm
-                        scmSkip(deleteBuild: true, skipPattern:'[ci skip]')
+                        scmSkip(deleteBuild: true, skipPattern:'.*\\[ci skip\\].*')
                     }
                 }
 
@@ -82,17 +82,15 @@ pipeline {
     stage("Commit Version"){
         steps{
             echo 'commiting to git'
-            withCredentials([usernamePassword(credentialsId:'github-credentials', usernameVariable: 'GITUSER', passwordVariable: 'GITPASS')]){
-                sh """
+            sh """
                 git config user.name "jenkins"
                 git config user.email "jenkins@thesudofiles.com"
                 git add .
                 git commit -m "[ci skip] version bump"
-                """
+            """
                 gitPush(gitScm: scm, targetBranch: 'master', targetRepo: 'origin')
 
 
-            }
         }
     }
 
