@@ -102,25 +102,25 @@ pipeline {
         success {
 
             slackSend(
-                channel: '#your-channel-name',
-                color: 'good', // Green color for success
+                channel: '#ci-cd',
+                color: 'good',
                 message: "SUCCESSFUL: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
             )
         }
         failure {
-            // This block runs only if the entire pipeline fails
+
             slackSend(
-                channel: '#your-channel-name',
-                color: 'danger', // Red color for failure
-                color: '#FF0000', // Hex color also works
+                channel: '#ci-cd',
+                color: 'danger',
+                color: '#FF0000',
                 message: "FAILED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
             )
         }
-        // You can add other conditions like 'unstable', 'aborted', 'always' etc.
+
         unstable {
             slackSend(
-                channel: '#your-channel-name',
-                color: 'warning', // Yellow color for unstable (e.g., test failures)
+                channel: '#ci-cd',
+                color: 'warning',
                 message: "UNSTABLE: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
             )
         }
