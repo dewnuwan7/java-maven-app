@@ -74,7 +74,6 @@ pipeline {
             echo 'commiting to git'
             withCredentials([usernamePassword(credentialsId:'github-key', usernameVariable: 'GITUSER', passwordVariable: 'GITPASS')]){
                 sh """
-                https://username:token@github.com/username/repository.git
                 git config user.name "jenkins"
                 git config user.email "jenkins@thesudofiles.com"
                 git add .
