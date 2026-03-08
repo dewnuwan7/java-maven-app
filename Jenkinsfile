@@ -72,13 +72,14 @@ pipeline {
     stage("Commit Version"){
         steps{
             echo 'commiting to git'
-            sshagent(credentials: ['github-key']){
+            withCredentials([usernamePassword(credentialsId:'github-key', usernameVariable: 'GITUSER', passwordVariable: 'GITPASS')]){
                 sh """
+                https://username:token@github.com/username/repository.git
                 git config user.name "jenkins"
                 git config user.email "jenkins@thesudofiles.com"
                 git add .
                 git commit -m "[ci skip] version bump"
-                git push origin HEAD:main
+                git push https://$GITUSER:$GITPASS@://github.com/dewnuwan7/java-maven-app.git HEAD:main
                 """
 
             }
