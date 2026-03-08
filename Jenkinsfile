@@ -8,7 +8,16 @@ pipeline {
  }
 
  stages{
-    stage("init"){
+
+    stage('Checkout') {
+                    steps {
+                        checkout scm
+                        scmSkip(deleteBuild: true, skipPattern:'[ci skip]')
+                    }
+                }
+
+
+    stage("Increment Version"){
         steps{
             script{
                 echo "Initializing"
@@ -23,7 +32,7 @@ pipeline {
         }
     }
 
-    stage("code scan"){
+    stage("Code Scan"){
         steps{
             script{
                 echo 'Scanning code for quatliy improvements'
@@ -40,7 +49,7 @@ pipeline {
         }
     }
 
-    stage("Build Docker"){
+    stage("Build Image"){
         steps{
             script{
                 sh "docker build -t dewnuwan/java-maven-app:jma-${IMAGE_NAME} ."
@@ -78,8 +87,9 @@ pipeline {
                 git config user.email "jenkins@thesudofiles.com"
                 git add .
                 git commit -m "[ci skip] version bump"
-                git push https://$GITUSER:$GITPASS@github.com/dewnuwan7/java-maven-app.git HEAD:main
                 """
+                gitPush(gitScm: scm, targetBranch: 'master', targetRepo: 'origin')
+
 
             }
         }
