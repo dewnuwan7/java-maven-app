@@ -78,7 +78,7 @@ pipeline {
                 git config user.email "jenkins@thesudofiles.com"
                 git add .
                 git commit -m "[ci skip] version bump"
-                git push https://$GITUSER:$GITPASS@://github.com/dewnuwan7/java-maven-app.git HEAD:main
+                git push https://$GITUSER:$GITPASS@github.com/dewnuwan7/java-maven-app.git HEAD:main
                 """
 
             }
