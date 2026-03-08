@@ -23,6 +23,15 @@ pipeline {
         }
     }
 
+    stage("code scan"){
+        steps{
+            script{
+                echo 'Scanning code for quatliy improvements'
+
+            }
+        }
+    }
+
     stage("Build Project"){
         steps{
             script{
@@ -53,9 +62,8 @@ pipeline {
 
     stage("Deploy"){
         steps{
-            script{
-                echo 'Deploying to remote VM'
-            }
+            echo 'Deploying to remote server..'
+            sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'docker -v', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
 
@@ -70,3 +78,5 @@ pipeline {
  }
 
 }
+
+
