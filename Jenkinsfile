@@ -28,6 +28,7 @@ pipeline {
                 def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
                 def version = matcher[1][1]
                 env.IMAGE_NAME = "$version-${BUILD_NUMBER}"
+                env.IMAGE_TAG= "dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
             }
         }
     }
@@ -52,7 +53,7 @@ pipeline {
     stage("Build Image"){
         steps{
             script{
-                sh "docker build -t dewnuwan/java-maven-app:jma-${IMAGE_NAME} ."
+                sh "docker build -t ${IMAGE_TAG} ."
             }
         }
     }
@@ -62,8 +63,8 @@ pipeline {
             script{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                     sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
-                    sh "docker push dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
-                    sh "docker rmi dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
+                    sh "docker push ${IMAGE_TAG}"
+                    sh "docker rmi ${IMAGE_TAG}"
                 }
             }
         }
@@ -75,7 +76,7 @@ pipeline {
             sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """docker stop java-maven-app
             docker rm java-maven-app
             docker images dewnuwan/java-maven-app --format "{{.ID}}" | tail -n +2 | xargs -r docker rmi
-            docker run -d -p 8080:8080 --name java-maven-app dewnuwan/java-maven-app:jma-${IMAGE_NAME}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            docker run -d -p 8080:8080 --name java-maven-app ${IMAGE_TAG}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
 
@@ -111,6 +112,7 @@ pipeline {
 *Job:* ${env.JOB_NAME}
 *Build:* #${env.BUILD_NUMBER}
 *Branch:* ${env.BRANCH_NAME}
+*Docker Image:* ${env.IMAGE_TAG}
 *Duration:* ${currentBuild.durationString}
 
 *Deployment:* <http://168.144.23.78:8080|Open Application>
