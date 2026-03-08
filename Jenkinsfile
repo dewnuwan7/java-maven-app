@@ -63,15 +63,25 @@ pipeline {
     stage("Deploy"){
         steps{
             echo 'Deploying to remote server..'
-            sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: '''docker stop java-maven-app
+            sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """docker stop java-maven-app
             docker rm java-maven-app
-            docker run -d -p 8080:8080 --name java-maven-app dewnuwan/java-maven-app:jma-${IMAGE_NAME}''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            docker run -d -p 8080:8080 --name java-maven-app dewnuwan/java-maven-app:jma-${IMAGE_NAME}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
 
     stage("Commit Version"){
         steps{
             echo 'commiting to git'
+            sshagent(credentials: ['github-key']){
+                sh """
+                git config user.name "jenkins"
+                git config user.email "jenkins@thesudofiles.com"
+                git add .
+                git commit -m "[ci skip] version bump"
+                git push origin HEAD:main
+                """
+
+            }
         }
     }
 
