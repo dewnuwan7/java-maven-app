@@ -106,18 +106,18 @@ pipeline {
                 channel: '#ci-cd',
                 color: 'good',
                 message: """
-                        :white_check_mark: *BUILD SUCCESS*
+:white_check_mark: *BUILD SUCCESS*
 
-                        *Job:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *Branch:* ${env.BRANCH_NAME}
-                        *Duration:* ${currentBuild.durationString}
+*Job:* ${env.JOB_NAME}
+*Build:* #${env.BUILD_NUMBER}
+*Branch:* ${env.BRANCH_NAME}
+*Duration:* ${currentBuild.durationString}
 
-                        *Deployment:* http://168.144.23.78:8080
+*Deployment:* <http://168.144.23.78:8080|Open Application>
 
-                        *Build Logs:* ${env.BUILD_URL}
-                        """
-                )
+*Build Logs:* ${env.BUILD_URL}
+"""
+            )
         }
 
         failure {
@@ -125,16 +125,16 @@ pipeline {
                 channel: '#ci-cd',
                 color: 'danger',
                 message: """
-                        :x: *BUILD FAILED*
+:x: *BUILD FAILED*
 
-                        *Job:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *Branch:* ${env.BRANCH_NAME}
+*Job:* ${env.JOB_NAME}
+*Build:* #${env.BUILD_NUMBER}
+*Branch:* ${env.BRANCH_NAME}
 
-                        Check logs:
-                        ${env.BUILD_URL}
-                        """
-                )
+Check logs:
+${env.BUILD_URL}
+"""
+            )
         }
 
         unstable {
@@ -142,15 +142,15 @@ pipeline {
                 channel: '#ci-cd',
                 color: 'warning',
                 message: """
-                        :warning: *BUILD UNSTABLE*
+:warning: *BUILD UNSTABLE*
 
-                        *Job:* ${env.JOB_NAME}
-                        *Build:* #${env.BUILD_NUMBER}
-                        *Branch:* ${env.BRANCH_NAME}
+*Job:* ${env.JOB_NAME}
+*Build:* #${env.BUILD_NUMBER}
+*Branch:* ${env.BRANCH_NAME}
 
-                        Review test results:
-                        ${env.BUILD_URL}
-                        """
+Review test results:
+${env.BUILD_URL}
+"""
             )
         }
     }
