@@ -74,6 +74,7 @@ pipeline {
             echo 'Deploying to remote server..'
             sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """docker stop java-maven-app
             docker rm java-maven-app
+            docker image prune -f
             docker run -d -p 8080:8080 --name java-maven-app dewnuwan/java-maven-app:jma-${IMAGE_NAME}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
@@ -81,7 +82,7 @@ pipeline {
     stage("Commit Version"){
         steps{
             echo 'commiting to git'
-            withCredentials([usernamePassword(credentialsId:'github-key', usernameVariable: 'GITUSER', passwordVariable: 'GITPASS')]){
+            withCredentials([usernamePassword(credentialsId:'github-credentials', usernameVariable: 'GITUSER', passwordVariable: 'GITPASS')]){
                 sh """
                 git config user.name "jenkins"
                 git config user.email "jenkins@thesudofiles.com"
