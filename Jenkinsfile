@@ -60,9 +60,11 @@ pipeline {
         steps{
             script{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh "docker build -t ${IMAGE_TAG} ."
-                    sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
-                    sh "docker push ${IMAGE_TAG}"
+                    sh "docker build --pull --cache-from ${IMAGE_TAG} -t ${IMAGE_TAG} ."
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+                        def app = docker.build("${IMAGE_TAG}")
+                        app.push()
+                    }
                     sh "docker rmi ${IMAGE_TAG}"
                 }
 
