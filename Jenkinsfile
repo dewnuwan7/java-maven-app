@@ -79,7 +79,8 @@ pipeline {
             sshPublisher(publishers: [sshPublisherDesc(configName: 'prod-server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: """docker stop java-maven-app
             docker rm java-maven-app
             docker images dewnuwan/java-maven-app --format "{{.ID}}" | tail -n +2 | xargs -r docker rmi
-            docker run -d -p 8080:8080 --name java-maven-app ${IMAGE_TAG}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+            docker run -d -p 8080:8080 --name java-maven-app ${IMAGE_TAG}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+',
+            remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
 
