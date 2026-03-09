@@ -20,18 +20,8 @@ The pipeline automatically:
 * Deploys the container
 
 ## Architecture
+<img width="1837" height="903" alt="java-maven-cicd-pipeline excalidraw (2)" src="https://github.com/user-attachments/assets/29a1cee5-e463-4913-8349-211c1154a6de" />
 
-## Project Structure
-
-java-maven-jenkins-docker-pipeline
-│
-├── src/
-│   └── main/java
-│
-├── pom.xml
-├── Dockerfile
-├── Jenkinsfile
-└── README.md
 
 ## Prerequisites
 
@@ -50,4 +40,85 @@ Make sure the following tools are installed:
 ***
 
 ## Setup Instructions
+1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/java-maven-jenkins-docker-pipeline.git
+cd java-maven-jenkins-docker-pipeline
+```
+2. Build the Application
+Use Maven to compile and package the application. This generates a .jar file inside the target/ directory:
+```bash
+mvn clean package
+```
+3. Build and Run the Docker Image
+Build the image:
+```bash
+docker build -t java-maven-app .
+```
+4. Run the container:
+```bash
+docker run -p 8080:8080 java-maven-app
+```
+***
+## Jenkins Pipeline
+The CI/CD pipeline is defined as code using a Jenkinsfile.
 
+```groovy
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/yourusername/java-maven-jenkins-docker-pipeline.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t java-maven-app .'
+            }
+        }
+
+        stage('Run Container') {
+            steps {
+                sh 'docker run -d -p 8080:8080 java-maven-app'
+            }
+        }
+    }
+}
+```
+***
+## Pipeline Workflow
+The Jenkins pipeline executes the following stages:
+
+* Code Checkout: Jenkins pulls the latest code from the repository.
+
+* Build: Maven compiles the Java source code.
+
+* Test: Unit tests are executed to validate the build.
+
+* Package: The project is packaged into a .jar artifact.
+
+* Docker Build: A Docker image is built containing the application.
+
+* Deployment: The container is started using the newly built image.
+
+***
+
+## Benefits of This Setup
+* Automated builds
+
+* Faster deployments
+
+* Consistent runtime environment
+
+* Reduced manual errors
+
+* Easy scaling with containerization
