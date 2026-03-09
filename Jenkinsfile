@@ -33,22 +33,32 @@ pipeline {
         }
     }
 
-    stage("Code Scan"){
-        steps{
-            script{
-                echo 'Scanning code for quatliy improvements'
-
-            }
-        }
-    }
-
     stage("Build Project"){
         steps{
             script{
                 sh 'mvn clean package'
+                echo 'commiting to git'
+                sh """
+                   git config user.name "jenkins"
+                   git config user.email "jenkins@thesudofiles.com"
+                   git add .
+                   git commit -m "[ci-skip] version bump"
+                   """
+                gitPush(gitScm: scm, targetBranch: 'master', targetRepo: 'origin')
+
             }
         }
     }
+
+    stage("Test"){
+        steps {
+            script{
+                sh 'mvn test'
+
+            }
+        }
+    }
+
 
     stage("Build Image"){
         steps{
@@ -79,23 +89,6 @@ pipeline {
             docker run -d -p 8080:8080 --name java-maven-app ${IMAGE_TAG}""", execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
         }
     }
-
-    stage("Commit Version"){
-        steps{
-            echo 'commiting to git'
-            sh """
-                git config user.name "jenkins"
-                git config user.email "jenkins@thesudofiles.com"
-                git add .
-                git commit -m "[ci-skip] version bump"
-            """
-                gitPush(gitScm: scm, targetBranch: 'master', targetRepo: 'origin')
-
-
-        }
-    }
-
-
 
  }
 
