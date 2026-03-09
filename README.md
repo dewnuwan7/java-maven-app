@@ -7,6 +7,10 @@ A complete CI/CD pipeline for a Java application using Maven, Jenkins, and Docke
 
 This project implements a Continuous Integration and Continuous Deployment (CI/CD) workflow for a Java application. Using CI/CD automation ensures faster releases, consistent builds, and fewer manual deployment errors.
 
+[![Watch the video](https://img.youtube.com/vi/1jv38kaBVOQ/hqdefault.jpg)](https://www.youtube.com/embed/1jv38kaBVOQ)
+
+
+
 The pipeline automatically:
 
 * Pulls source code from a repository
