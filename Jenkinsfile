@@ -9,35 +9,32 @@ pipeline {
 
  stages{
 
-    stage('Checkout') {
+    stage('Checkout Version') {
                     steps {
                         checkout scm
                         scmSkip(deleteBuild: true, skipPattern:'.*\\[ci-skip\\].*')
+
+                        script{
+
+                            //Incrementing Version
+
+                            sh "mvn build-helper:parse-version versions:set \
+                            -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit"
+                            def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                            def version = matcher[1][1]
+                            env.IMAGE_NAME = "$version-${BUILD_NUMBER}"
+                            env.IMAGE_TAG= "dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
+                        }
                     }
                 }
-
-
-    stage("Increment Version"){
-        steps{
-            script{
-                echo "Initializing"
-                echo "Incrementing Version.."
-
-                sh "mvn build-helper:parse-version versions:set \
-                -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit"
-                def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
-                def version = matcher[1][1]
-                env.IMAGE_NAME = "$version-${BUILD_NUMBER}"
-                env.IMAGE_TAG= "dewnuwan/java-maven-app:jma-${IMAGE_NAME}"
-            }
-        }
-    }
 
     stage("Build Project"){
         steps{
             script{
+
                 sh 'mvn clean package'
-                echo 'commiting to git'
+
+               //commiting to git
                 sh """
                    git config user.name "jenkins"
                    git config user.email "jenkins@thesudofiles.com"
@@ -54,7 +51,6 @@ pipeline {
         steps {
             script{
                 sh 'mvn test'
-
             }
         }
     }
@@ -63,22 +59,17 @@ pipeline {
     stage("Build Image"){
         steps{
             script{
-                sh "docker build -t ${IMAGE_TAG} ."
-            }
-        }
-    }
-
-    stage("Publish"){
-        steps{
-            script{
                 withCredentials([usernamePassword(credentialsId: 'dockerhub', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh "docker build -t ${IMAGE_TAG} ."
                     sh "echo $PASSWORD | docker login -u $USERNAME --password-stdin"
                     sh "docker push ${IMAGE_TAG}"
                     sh "docker rmi ${IMAGE_TAG}"
                 }
+
             }
         }
     }
+
 
     stage("Deploy"){
         steps{
@@ -91,7 +82,6 @@ pipeline {
     }
 
  }
-
 
     post {
 
